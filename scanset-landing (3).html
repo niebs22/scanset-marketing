@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ScanSet — Know who's actually using your gym</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1C1C1E;
+    --paper: #F5F3EE;
+    --paper-raised: #FFFFFF;
+    --accent: #E8542A;
+    --steel: #6B6E73;
+    --steel-light: #C9C7C1;
+    --line: rgba(28,28,30,0.12);
+    --brand: #E8542A;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.01em;
+  }
+
+  a { color: inherit; }
+
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 32px; }
+  @media (max-width: 640px) { .wrap { padding: 0 20px; } }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 50;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 72px; }
+  .logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -0.01em; }
+  .logo span { color: var(--accent); }
+  .nav-cta {
+    background: var(--ink); color: var(--paper); border: none;
+    padding: 11px 22px; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 15px;
+    border-radius: 3px; cursor: pointer; transition: background 0.15s ease;
+  }
+  .nav-cta:hover { background: var(--accent); }
+
+  /* HERO */
+  .hero { padding: 88px 0 96px; border-bottom: 1px solid var(--line); }
+  .hero .wrap { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 64px; align-items: center; }
+  @media (max-width: 860px) { .hero .wrap { grid-template-columns: 1fr; gap: 48px; } .hero { padding: 56px 0 64px; } }
+  .hero h1 { font-size: clamp(44px, 6vw, 76px); max-width: 11ch; }
+  .hero-sub { margin-top: 24px; font-size: 19px; color: #45474b; max-width: 46ch; }
+  .hero-actions { margin-top: 36px; display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+  .btn-primary {
+    background: var(--accent); color: white; border: none; padding: 15px 28px;
+    font-size: 16px; font-weight: 600; border-radius: 3px; cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(232,84,42,0.28); }
+  .btn-ghost {
+    background: none; border: none; padding: 15px 4px; font-size: 16px; font-weight: 600;
+    color: var(--ink); cursor: pointer; border-bottom: 2px solid var(--ink);
+  }
+
+  /* PHONE MOCK — live scan-feed UI, no external image */
+  .phone-col { display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .wl-toggle-row { display: flex; align-items: center; gap: 10px; }
+  .wl-toggle-label { font-size: 12px; color: var(--steel); font-weight: 600; }
+  .wl-toggle {
+    width: 42px; height: 24px; border-radius: 999px; border: none;
+    background: var(--steel-light); cursor: pointer; position: relative; padding: 0;
+    transition: background 0.15s ease; flex-shrink: 0;
+  }
+  .wl-toggle-thumb {
+    position: absolute; top: 3px; left: 3px; width: 18px; height: 18px;
+    background: white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    transition: transform 0.15s ease;
+  }
+  .wl-toggle[aria-checked="true"] { background: var(--brand); }
+  .wl-toggle[aria-checked="true"] .wl-toggle-thumb { transform: translateX(18px); }
+  .swatch-row { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .swatch-label { font-size: 12.5px; color: var(--steel); font-weight: 600; }
+  .swatches { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center; }
+  .swatch {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: var(--sw); border: 2px solid transparent;
+    cursor: pointer; padding: 0; position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    transition: transform 0.12s ease, border-color 0.12s ease;
+  }
+  .swatch:hover { transform: scale(1.1); }
+  .swatch.active { border-color: var(--ink); }
+  .swatch.active::after {
+    content: ''; position: absolute; inset: -5px;
+    border: 1.5px solid var(--ink); border-radius: 50%;
+  }
+  .swatch-custom {
+    background: conic-gradient(from 180deg, #E8542A, #C99A2E, #D6C13B, #4C8A5E, #3B6FA6, #6B4E8E, #E8542A);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .swatch-custom input[type="color"] {
+    opacity: 0; width: 30px; height: 30px; cursor: pointer; position: absolute; inset: 0; border: none; padding: 0;
+  }
+  .phone-stage {
+    display: flex; align-items: center; justify-content: center;
+    gap: 22px; position: relative;
+  }
+  .wl-card {
+    background: var(--ink); border: 1px solid var(--brand); border-radius: 12px;
+    padding: 16px 18px; width: 148px; flex-shrink: 0;
+    box-shadow: 0 12px 28px -10px rgba(28,28,30,0.4);
+  }
+  .wl-eyebrow {
+    font-size: 10px; letter-spacing: 0.09em; font-weight: 700;
+    color: rgba(245,243,238,0.5); margin-bottom: 8px;
+  }
+  .wl-name { color: var(--paper); font-size: 17px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; line-height: 1.15; }
+  .wl-name span { color: var(--brand); }
+  .wl-sub { color: rgba(245,243,238,0.55); font-size: 11.5px; margin-top: 10px; line-height: 1.4; }
+  .wl-arrow {
+    width: 20px; height: 20px; flex-shrink: 0; color: var(--brand);
+    display: flex; align-items: center; justify-content: center;
+  }
+  @media (max-width: 1000px) {
+    .phone-stage { flex-direction: column; gap: 14px; }
+    .wl-card { width: 100%; max-width: 260px; text-align: left; }
+    .wl-arrow { transform: rotate(90deg); }
+  }
+  .phone {
+    width: 260px; background: var(--ink); border-radius: 34px; padding: 14px;
+    box-shadow: 0 30px 60px -20px rgba(28,28,30,0.45);
+  }
+  .phone-screen {
+    background: #0A0A0A; border-radius: 22px; overflow: hidden; height: 560px;
+    display: flex; flex-direction: column;
+    font-family: 'Inter', sans-serif; color: #F5F3EE;
+  }
+
+  /* DASHBOARD SCREEN */
+  .dash-topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 16px 14px; border-bottom: 1px solid rgba(245,243,238,0.08);
+  }
+  .dash-logo { font-size: 15px; font-weight: 500; color: #DEDBD2; }
+  .dash-logo span { color: var(--brand); font-weight: 700; }
+  .dash-logo-custom {
+    display: none; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 700; color: #DEDBD2; font-family: 'Barlow Condensed', sans-serif;
+  }
+  .dash-logo-custom svg { width: 18px; height: 18px; color: var(--brand); flex-shrink: 0; }
+  .dash.wl-on .dash-logo { display: none; }
+  .dash.wl-on .dash-logo-custom { display: flex; }
+  .dash-nav-links { display: flex; gap: 12px; font-size: 10px; color: rgba(245,243,238,0.55); }
+  .dash-body { padding: 16px 16px 0; flex: 1; overflow: hidden; }
+  .dash-greeting { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 21px; line-height: 1.05; }
+  .dash-subtext { font-size: 11px; color: rgba(245,243,238,0.55); margin-top: 4px; }
+  .dash-card {
+    background: rgba(245,243,238,0.04); border: 1px solid rgba(245,243,238,0.08);
+    border-radius: 10px; padding: 14px; margin-top: 12px;
+  }
+  .dash-label { font-size: 9px; letter-spacing: 0.08em; color: rgba(245,243,238,0.4); font-weight: 700; }
+  .dash-cta-card { text-align: center; }
+  .dash-scan-btn {
+    width: 100%; margin-top: 10px; background: var(--brand); color: white; border: none;
+    padding: 12px; border-radius: 8px; font-size: 13px; font-weight: 700; font-family: 'Inter', sans-serif;
+  }
+  .dash-select {
+    margin-top: 8px; border: 1px solid rgba(245,243,238,0.15); border-radius: 8px;
+    padding: 10px 12px; font-size: 11.5px; color: rgba(245,243,238,0.5);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .dash-stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .dash-stat.highlight { border-color: var(--brand); }
+  .dash-big { font-family: 'Barlow Condensed', sans-serif; font-weight: 800; font-size: 22px; margin-top: 6px; }
+  .dash-big.small { font-size: 20px; margin-top: 0; }
+  .dash-dim { font-size: 10px; color: rgba(245,243,238,0.45); margin-top: 2px; }
+  .dash-dim.small { margin-top: 8px; }
+  .dash-dim span { color: var(--brand); font-weight: 700; }
+  .dash-elephants { font-size: 11px; margin-top: 8px; color: var(--brand); font-weight: 700; }
+  .dash-bar { height: 3px; background: rgba(245,243,238,0.12); border-radius: 2px; margin-top: 8px; overflow: hidden; }
+  .dash-bar-fill { width: 55%; height: 100%; background: var(--brand); }
+  .dash-ring-row { display: flex; align-items: center; gap: 10px; }
+  .dash-ring {
+    width: 42px; height: 42px; border-radius: 50%; border: 3px solid var(--brand); opacity: 0.55;
+    display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .dash-challenge .dash-label { color: var(--brand); display: flex; justify-content: space-between; }
+  .dash-challenge .dash-dim { font-size: 11px; line-height: 1.5; margin-top: 8px; }
+  .dash-tabbar {
+    display: flex; justify-content: space-around; align-items: center;
+    padding: 10px 8px 14px; border-top: 1px solid rgba(245,243,238,0.08);
+  }
+  .dash-tab { font-size: 9px; color: rgba(245,243,238,0.5); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .dash-tab-icon { font-size: 15px; color: rgba(245,243,238,0.5); }
+  .dash-tab.active { color: var(--brand); font-weight: 700; }
+  .dash-tab.active .dash-tab-icon {
+    color: var(--brand); border: 2px solid var(--brand); border-radius: 50%;
+    width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; font-size: 11px;
+  }
+
+  /* STAT STRIP */
+  .stats { border-bottom: 1px solid var(--line); padding: 40px 0; }
+  .stats .wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  @media (max-width: 640px) { .stats .wrap { grid-template-columns: 1fr; gap: 28px; } }
+  .stat-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 46px; color: var(--accent); line-height: 1; }
+  .stat-label { font-size: 14px; color: var(--steel); margin-top: 6px; max-width: 30ch; }
+
+  /* SECTIONS */
+  .section { padding: 100px 0; border-bottom: 1px solid var(--line); }
+  .section-head { max-width: 640px; margin-bottom: 56px; }
+  .section-head h2 { font-size: clamp(32px, 4vw, 48px); }
+  .section-head p { margin-top: 16px; font-size: 17px; color: #45474b; max-width: 52ch; }
+
+  .feature-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  @media (max-width: 780px) { .feature-row { grid-template-columns: 1fr; } }
+  .feature { background: var(--paper); padding: 36px 32px; }
+  .feature-num { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--steel-light); letter-spacing: 0.02em; }
+  .feature h3 { font-size: 26px; margin-top: 14px; font-weight: 700; }
+  .feature p { margin-top: 10px; font-size: 15px; color: #45474b; }
+
+  /* QUOTE */
+  .quote-block { padding: 88px 0; border-bottom: 1px solid var(--line); background: var(--ink); color: var(--paper); }
+  .quote-block .wrap { max-width: 780px; }
+  .quote-block blockquote { font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: clamp(26px, 3.4vw, 36px); line-height: 1.2; }
+  .quote-attr { margin-top: 24px; font-size: 15px; color: var(--steel-light); }
+  .quote-attr strong { color: var(--paper); }
+
+  /* PRICING */
+  .plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 780px) { .plan-grid { grid-template-columns: 1fr; } }
+  .plan-card { border: 1px solid var(--line); border-radius: 6px; padding: 30px 26px; background: var(--paper-raised); position: relative; }
+  .plan-card.featured { border-color: var(--accent); border-width: 2px; }
+  .plan-tag {
+    position: absolute; top: 26px; right: 26px; font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em;
+    color: var(--accent); background: rgba(232,84,42,0.1); border-radius: 999px; padding: 5px 12px;
+  }
+  .plan-card .plan-name { font-size: 12.5px; letter-spacing: 0.1em; color: var(--steel); font-weight: 700; }
+  .plan-card .plan-price { font-family: 'Barlow Condensed', sans-serif; font-size: 38px; font-weight: 700; margin-top: 14px; }
+  .plan-price span { font-size: 14px; color: var(--steel); font-family: 'Inter', sans-serif; font-weight: 500; }
+  .plan-list { list-style: none; margin-top: 20px; }
+  .plan-list li { font-size: 13.5px; color: #45474b; padding: 8px 0; border-top: 1px solid var(--line); }
+  .plan-list li:first-child { border-top: none; }
+  .plan-list li::before { content: '— '; color: var(--accent); }
+
+  /* LEAD FORM */
+  .lead-section { padding: 100px 0; }
+  .lead-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  @media (max-width: 860px) { .lead-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .lead-copy h2 { font-size: clamp(32px, 4vw, 46px); }
+  .lead-copy p { margin-top: 18px; font-size: 16px; color: #45474b; max-width: 42ch; }
+  .lead-list { margin-top: 28px; list-style: none; }
+  .lead-list li { display: flex; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
+  .lead-list li:last-child { border-bottom: 1px solid var(--line); }
+  .lead-list .mark { color: var(--accent); font-weight: 700; }
+
+  form { display: flex; flex-direction: column; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--steel); }
+  .field input {
+    font-family: 'Inter', sans-serif; font-size: 15px; padding: 13px 14px;
+    border: 1px solid var(--steel-light); border-radius: 3px; background: white; color: var(--ink);
+  }
+  .field input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .field-row { grid-template-columns: 1fr; } }
+  .submit-btn {
+    margin-top: 8px; background: var(--accent); color: white; border: none; padding: 16px;
+    font-size: 16px; font-weight: 700; border-radius: 3px; cursor: pointer; transition: background 0.15s ease;
+  }
+  .submit-btn:hover { background: #d1471f; }
+  .form-note { font-size: 13px; color: var(--steel); text-align: center; margin-top: 4px; }
+
+  .success-state { display: none; flex-direction: column; align-items: flex-start; gap: 12px; padding: 32px 0; }
+  .success-state.active { display: flex; }
+  .success-mark {
+    width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: white;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 700;
+  }
+  .success-state h3 { font-size: 26px; }
+  .success-state p { color: #45474b; font-size: 15px; max-width: 40ch; }
+
+  footer { border-top: 1px solid var(--line); padding: 32px 0; }
+  footer .wrap { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--steel); flex-wrap: wrap; gap: 12px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="logo">Scan<span>Set</span></div>
+    <div style="display:flex; align-items:center; gap:24px;">
+      <a href="https://app.scanset.app" style="font-size:15px; font-weight:600; color:var(--ink); text-decoration:none;">Log in</a>
+      <button class="nav-cta" onclick="document.getElementById('lead-form').scrollIntoView()">Get early access</button>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <h1>Know who's actually using your gym.</h1>
+      <p class="hero-sub">ScanSet turns every check-in into data. One QR scan at the door tells you who showed up, what they used, and who's about to quit — before they do.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="document.getElementById('lead-form').scrollIntoView()">See it on your gym</button>
+        <button class="btn-ghost" onclick="document.getElementById('how-it-works').scrollIntoView()">How it works</button>
+      </div>
+    </div>
+    <div class="phone-col">
+      <div class="phone-stage">
+        <div class="wl-card">
+          <div class="wl-eyebrow">WHITE-LABELED</div>
+          <div class="wl-name">Nathan's <span>Gym</span></div>
+          <div class="wl-sub">Your logo. Your colors. Your app.</div>
+        </div>
+        <div class="wl-arrow">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M5 12h13M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="phone">
+          <div class="phone-screen dash">
+            <div class="dash-topbar">
+              <div class="dash-logo">scan<span>set</span></div>
+              <div class="dash-logo-custom">
+                <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <line x1="30" y1="18" x2="30" y2="82" stroke="currentColor" stroke-width="7" stroke-linecap="square"/>
+                  <line x1="70" y1="18" x2="70" y2="82" stroke="currentColor" stroke-width="7" stroke-linecap="square"/>
+                  <line x1="18" y1="88" x2="82" y2="12" stroke="currentColor" stroke-width="7" stroke-linecap="square"/>
+                </svg>
+                Nathan's Gym
+              </div>
+              <div class="dash-nav-links"><span>Admin</span><span>Log Out</span></div>
+            </div>
+            <div class="dash-body">
+              <h4 class="dash-greeting">Good morning, Nathan</h4>
+              <div class="dash-subtext">You haven't trained yet this week.</div>
+
+              <div class="dash-card dash-cta-card">
+                <div class="dash-label">READY TO TRAIN?</div>
+                <button class="dash-scan-btn">Scan QR Code</button>
+                <div class="dash-select">Select equipment manually <span>▾</span></div>
+              </div>
+
+              <div class="dash-stat-row">
+                <div class="dash-card dash-stat">
+                  <div class="dash-label">LIFETIME</div>
+                  <div class="dash-big">387,379</div>
+                  <div class="dash-dim">lbs lifted</div>
+                  <div class="dash-elephants">🐘 <span>43.0 elephants</span></div>
+                  <div class="dash-bar"><div class="dash-bar-fill"></div></div>
+                  <div class="dash-dim small">Next: <span>400,000 lbs</span></div>
+                </div>
+                <div class="dash-card dash-stat highlight">
+                  <div class="dash-label">MY STATS</div>
+                  <div class="dash-ring-row">
+                    <div class="dash-ring">0/4</div>
+                    <div>
+                      <div class="dash-big small">0</div>
+                      <div class="dash-dim">sessions this week</div>
+                    </div>
+                  </div>
+                  <div class="dash-dim small"><span>540</span> lifetime sessions</div>
+                </div>
+              </div>
+
+              <div class="dash-card dash-challenge">
+                <div class="dash-label">LOOKING FOR A CHALLENGE? <span>▾</span></div>
+                <div class="dash-dim">Not sure what to work today? We picked exercises you haven't hit in a while — try to beat your last session.</div>
+              </div>
+            </div>
+            <div class="dash-tabbar">
+              <div class="dash-tab"><div class="dash-tab-icon">⌂</div>Home</div>
+              <div class="dash-tab"><div class="dash-tab-icon">∿</div>Progress</div>
+              <div class="dash-tab active"><div class="dash-tab-icon dash-scan-icon">▦</div>SCAN</div>
+              <div class="dash-tab"><div class="dash-tab-icon">▤</div>History</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="wl-toggle-row">
+        <span class="wl-toggle-label">ScanSet logo</span>
+        <button class="wl-toggle" id="wl-toggle" role="switch" aria-checked="false" aria-label="Toggle white-labeled logo">
+          <span class="wl-toggle-thumb"></span>
+        </button>
+        <span class="wl-toggle-label">Your logo</span>
+      </div>
+      <div class="swatch-row">
+        <div class="swatch-label">Make it your gym's colors:</div>
+        <div class="swatches">
+          <button class="swatch active" style="--sw:#E8542A" data-color="#E8542A" title="ScanSet Orange" aria-label="ScanSet Orange"></button>
+          <button class="swatch" style="--sw:#3B6FA6" data-color="#3B6FA6" title="Ocean Blue" aria-label="Ocean Blue"></button>
+          <button class="swatch" style="--sw:#6B4E8E" data-color="#6B4E8E" title="Plum" aria-label="Plum"></button>
+          <button class="swatch" style="--sw:#C99A2E" data-color="#C99A2E" title="Amber" aria-label="Amber"></button>
+          <button class="swatch" style="--sw:#5B6470" data-color="#5B6470" title="Slate" aria-label="Slate"></button>
+          <button class="swatch" style="--sw:#D6C13B" data-color="#D6C13B" title="Yellow" aria-label="Yellow"></button>
+          <button class="swatch" style="--sw:#4C8A5E" data-color="#4C8A5E" title="Green" aria-label="Green"></button>
+          <label class="swatch swatch-custom" title="Custom color">
+            <input type="color" id="brand-picker" value="#E8542A" aria-label="Custom color">
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="wrap">
+    <div><div class="stat-num">3.2×</div><div class="stat-label">More check-in data captured than swipe-card systems</div></div>
+    <div><div class="stat-num">14 days</div><div class="stat-label">Average lead time before a member goes quiet, once you can see it</div></div>
+    <div><div class="stat-num">&lt; 5 min</div><div class="stat-label">To set up a gym and start scanning members at the door</div></div>
+  </div>
+</section>
+
+<section class="section" id="how-it-works">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Three steps, no new hardware.</h2>
+      <p>ScanSet runs on the phone or tablet you already have at the front desk. No card readers, no badges to replace, no IT project.</p>
+    </div>
+    <div class="feature-row">
+      <div class="feature">
+        <div class="feature-num">AT THE DOOR</div>
+        <h3>Members scan in</h3>
+        <p>A QR code on their phone or a printed tag. One tap, under two seconds, no line.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-num">BEHIND THE SCENES</div>
+        <h3>Every visit becomes data</h3>
+        <p>Time of day, frequency, streaks, and drop-off patterns — tracked automatically, gym by gym.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-num">FOR YOU</div>
+        <h3>See who's slipping away</h3>
+        <p>A member who visited four times a week and stopped shows up before their card gets declined next renewal.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="quote-block">
+  <div class="wrap">
+    <blockquote>"I used to find out someone quit when their card stopped working. Now I know two weeks before they do."</blockquote>
+    <div class="quote-attr"><strong>Tim Chapin</strong> — Owner, Real Steel Fitness</div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>One plan, your branding.</h2>
+      <p>Every gym gets a white-labeled scanning app under its own name and colors — no ScanSet logo in front of your members.</p>
+    </div>
+    <div class="plan-grid">
+      <div class="plan-card">
+        <div class="plan-tag">SMALL GYMS</div>
+        <div class="plan-name">STARTER</div>
+        <div class="plan-price">$49 <span>/month</span></div>
+        <ul class="plan-list">
+          <li>Up to 150 active members</li>
+          <li>White-labeled scanning app</li>
+          <li>Check-in history &amp; streaks</li>
+        </ul>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-tag">MOST GYMS</div>
+        <div class="plan-name">GROWTH</div>
+        <div class="plan-price">$99 <span>/month</span></div>
+        <ul class="plan-list">
+          <li>Up to 500 active members</li>
+          <li>Drop-off &amp; churn alerts</li>
+          <li>Multi-location support</li>
+        </ul>
+      </div>
+      <div class="plan-card">
+        <div class="plan-tag">CHAINS</div>
+        <div class="plan-name">MULTI-SITE</div>
+        <div class="plan-price">Custom</div>
+        <ul class="plan-list">
+          <li>Unlimited members &amp; locations</li>
+          <li>Cross-location reporting</li>
+          <li>Dedicated onboarding</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="lead-section">
+  <div class="wrap">
+    <div class="lead-grid">
+      <div class="lead-copy">
+        <h2>See it running on your gym.</h2>
+        <p>Tell us a little about your gym and we'll set up a white-labeled version you can try with real members this week.</p>
+        <ul class="lead-list">
+          <li><span class="mark">—</span> No commitment to see a live demo</li>
+          <li><span class="mark">—</span> Set up in under a day, no IT needed</li>
+          <li><span class="mark">—</span> Keep your existing membership software</li>
+        </ul>
+      </div>
+      <div>
+        <form id="lead-form" onsubmit="event.preventDefault(); document.getElementById('form-fields').style.display='none'; document.getElementById('success').classList.add('active');">
+          <div id="form-fields" style="display:flex; flex-direction:column; gap:16px;">
+            <div class="field-row">
+              <div class="field"><label for="name">Your name</label><input id="name" type="text" placeholder="Nathan Rodriguez" required></div>
+              <div class="field"><label for="gym">Gym name</label><input id="gym" type="text" placeholder="Nathan's Gym" required></div>
+            </div>
+            <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="you@yourgym.com" required></div>
+            <div class="field-row">
+              <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" placeholder="(555) 555-5555"></div>
+              <div class="field"><label for="members">Active members</label><input id="members" type="text" placeholder="e.g. 120"></div>
+            </div>
+            <button type="submit" class="submit-btn">Request early access</button>
+            <div class="form-note">We'll reach out within a day to set up your demo.</div>
+          </div>
+          <div class="success-state" id="success">
+            <div class="success-mark">✓</div>
+            <h3>You're on the list.</h3>
+            <p>We'll be in touch shortly to set up your white-labeled demo.</p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Scan<span style="color:var(--accent);">Set</span> — © 2026</div>
+    <div>Built for gyms that want to know who's actually walking through the door.</div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var root = document.documentElement;
+    var swatches = document.querySelectorAll('.swatch[data-color]');
+    var customInput = document.getElementById('brand-picker');
+
+    function setBrand(color) {
+      root.style.setProperty('--brand', color);
+    }
+
+    swatches.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        swatches.forEach(function (b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        setBrand(btn.getAttribute('data-color'));
+        customInput.value = btn.getAttribute('data-color');
+      });
+    });
+
+    customInput.addEventListener('input', function () {
+      swatches.forEach(function (b) { b.classList.remove('active'); });
+      setBrand(customInput.value);
+    });
+
+    var wlToggle = document.getElementById('wl-toggle');
+    var dashScreen = document.querySelector('.phone-screen.dash');
+    wlToggle.addEventListener('click', function () {
+      var isOn = wlToggle.getAttribute('aria-checked') === 'true';
+      wlToggle.setAttribute('aria-checked', String(!isOn));
+      dashScreen.classList.toggle('wl-on', !isOn);
+    });
+  })();
+</script>
+</body>
+</html>
