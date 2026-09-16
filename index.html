@@ -230,7 +230,13 @@
   .feature { background: var(--paper); padding: 36px 32px; }
   .feature-num { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--steel-light); letter-spacing: 0.02em; }
   .feature h3 { font-size: 26px; margin-top: 14px; font-weight: 700; }
-  .feature p { margin-top: 10px; font-size: 15px; color: #45474b; }
+    .feature p { margin-top: 10px; font-size: 15px; color: #45474b; }
+
+  /* FAQ */
+  .faq-list { display: flex; flex-direction: column; gap: 1px; background: var(--line); border: 1px solid var(--line); }
+  .faq-item { background: var(--paper); padding: 28px 32px; }
+  .faq-item h3 { font-size: 21px; font-weight: 700; font-family: 'Barlow Condensed', sans-serif; }
+  .faq-item p { margin-top: 10px; font-size: 15px; color: #45474b; line-height: 1.6; max-width: 62ch; }
 
   /* QUOTE */
   .quote-block { padding: 88px 0; border-bottom: 1px solid var(--line); background: var(--ink); color: var(--paper); }
@@ -491,6 +497,32 @@
           <li>All features of Starter and Growth</li>
           <li>Monthly check-ins</li>
         </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Common questions.</h2>
+    </div>
+    <div class="faq-list">
+      <div class="faq-item">
+        <h3>Will my members actually use it?</h3>
+        <p>Adoption builds week over week as members start noticing the QR codes on equipment, not instantly. We push for high utilization in week one, then see it climb steadily from there as scanning becomes routine.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Do members need to download an app?</h3>
+        <p>No. ScanSet runs as a web app right in the browser, no download, no app store. Members can add it to their home screen for an app-like feel if they want, and it's always current since there's no manual update step. Every member on your gym is on the latest version automatically.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What if a QR code gets damaged, or I add new equipment?</h3>
+        <p>Print a new one anytime from the owner portal. Replace a damaged sticker, update a machine, or add a code for new equipment, all self-serve.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Is there a contract?</h3>
+        <p>Plans run on a 3-month minimum, long enough for adoption to build before you judge results. After that, it's month to month.</p>
       </div>
     </div>
   </div>
