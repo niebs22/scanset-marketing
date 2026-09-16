@@ -66,8 +66,7 @@
   .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
   .nav-menu { display: none; flex-direction: column; background: var(--paper); border-bottom: 1px solid var(--line); padding: 4px 32px 16px; }
   .nav-menu.open { display: flex; }
-  .nav-menu a { padding: 12px 0; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; border-top: 1px solid var(--line); }
-  .nav-menu a:first-child { border-top: none; }
+    .nav-menu a { padding: 10px 0; font-size: 15px; font-weight: 600; color: var(--ink); text-decoration: none; }
 
   /* HERO */
   .hero { padding: 88px 0 96px; border-bottom: 1px solid var(--line); }
@@ -225,10 +224,10 @@
   }
 
   /* STAT STRIP */
-  .stats { border-bottom: 1px solid var(--line); padding: 40px 0; }
+  .stats { border-bottom: 1px solid var(--line); padding: 72px 0; background: var(--paper-raised); }
   .stats .wrap { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
   @media (max-width: 640px) { .stats .wrap { grid-template-columns: 1fr; gap: 28px; } }
-  .stat-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 46px; color: var(--accent); line-height: 1; }
+  .stat-num { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 64px; color: var(--accent); line-height: 1; }
   .stat-label { font-size: 14px; color: var(--steel); margin-top: 6px; max-width: 30ch; }
 
   /* SECTIONS */
@@ -241,6 +240,7 @@
   @media (max-width: 780px) { .feature-row { grid-template-columns: 1fr; } }
   .feature { background: var(--paper); padding: 36px 32px; }
   .feature-num { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--steel-light); letter-spacing: 0.02em; }
+  .step-number { font-family: 'Barlow Condensed', sans-serif; font-size: 40px; font-weight: 800; color: var(--accent); line-height: 1; margin-bottom: 10px; }
   .feature h3 { font-size: 26px; margin-top: 14px; font-weight: 700; }
     .feature p { margin-top: 10px; font-size: 15px; color: #45474b; }
 
@@ -447,7 +447,7 @@
 
 <section class="stats">
   <div class="wrap">
-    <div><div class="stat-num">Every machine</div><div class="stat-label">Not just who walked in the door, what they actually used</div></div>
+    <div><div class="stat-num">1:1</div><div class="stat-label">Every machine tracked, not just who walked in the door</div></div>
     <div><div class="stat-num">Zero</div><div class="stat-label">New hardware. Runs on the phone members already carry</div></div>
     <div><div class="stat-num">&lt; 5 min</div><div class="stat-label">To print a QR code and get a new machine live</div></div>
   </div>
@@ -461,16 +461,19 @@
     </div>
     <div class="feature-row">
       <div class="feature">
+        <div class="step-number">01</div>
         <div class="feature-num">AT THE EQUIPMENT</div>
         <h3>Scan, then log</h3>
         <p>A QR code on each machine identifies the exercise. The member logs their own reps and weight right there, no separate screens to hunt through.</p>
       </div>
       <div class="feature">
+        <div class="step-number">02</div>
         <div class="feature-num">BEHIND THE SCENES</div>
         <h3>It adds up automatically</h3>
         <p>Every logged session rolls up into gym-wide data. You see which machines get used and how member engagement is trending, with no manual tracking on your end.</p>
       </div>
       <div class="feature">
+        <div class="step-number">03</div>
         <div class="feature-num">FOR YOU</div>
         <h3>See what's working, and what's not</h3>
         <p>Spot underused equipment before your next lease renewal, and catch disengaged members before they cancel.</p>
