@@ -604,13 +604,13 @@
         <form id="lead-form" onsubmit="handleLeadSubmit(event)">
           <div id="form-fields" style="display:flex; flex-direction:column; gap:16px;">
             <div class="field-row">
-              <div class="field"><label for="name">Your name</label><input id="name" type="text" placeholder="Nathan Rodriguez" required></div>
-              <div class="field"><label for="gym">Gym name</label><input id="gym" type="text" placeholder="Nathan's Gym" required></div>
+              <div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" placeholder="Nathan Rodriguez" required></div>
+              <div class="field"><label for="gym">Gym name</label><input id="gym" name="gym" type="text" placeholder="Nathan's Gym" required></div>
             </div>
-            <div class="field"><label for="email">Email</label><input id="email" type="email" placeholder="you@yourgym.com" required></div>
+            <div class="field"><label for="email">Email</label><input id="email" name="email" type="email" placeholder="you@yourgym.com" required></div>
             <div class="field-row">
-              <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" placeholder="(555) 555-5555"></div>
-              <div class="field"><label for="members">Active members</label><input id="members" type="text" placeholder="e.g. 120"></div>
+              <div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" placeholder="(555) 555-5555"></div>
+              <div class="field"><label for="members">Active members</label><input id="members" name="members" type="text" placeholder="e.g. 120"></div>
             </div>
             <button type="submit" class="submit-btn">Request early access</button>
             <div class="form-note">We'll reach out within a day to set up your demo.</div>
