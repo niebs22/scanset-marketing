@@ -232,8 +232,9 @@
   .trust-strip { padding: 32px 0; border-bottom: 1px solid var(--line); }
   .trust-strip .wrap { display: flex; align-items: center; gap: 28px; flex-wrap: wrap; }
   .trust-label { font-size: 11.5px; letter-spacing: 0.08em; color: var(--steel); font-weight: 700; white-space: nowrap; }
-  .trust-logos { display: flex; align-items: center; gap: 36px; flex-wrap: wrap; }
-  .trust-logo { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 20px; color: var(--steel-light); letter-spacing: 0.01em; }
+   .trust-logos { display: flex; align-items: center; gap: 40px; flex-wrap: wrap; }
+  .trust-logo-img { height: 44px; width: auto; filter: grayscale(100%); opacity: 0.55; transition: filter 0.2s ease, opacity 0.2s ease; }
+  .trust-logo-img:hover { filter: grayscale(0%); opacity: 1; }
 
   /* STAT STRIP */
   .stats { border-bottom: 1px solid var(--line); padding: 72px 0; background: var(--paper-raised); }
@@ -464,8 +465,9 @@
   <div class="wrap">
     <div class="trust-label">TRUSTED BY GYMS LIKE</div>
     <div class="trust-logos">
-      <div class="trust-logo">Real Steel Fitness</div>
-      <div class="trust-logo">Hardbodiez Gym</div>
+      <img class="trust-logo-img" src="realsteelNH.png" alt="Real Steel Fitness">
+      <img class="trust-logo-img" src="hardbodiez-logo.png" alt="Hardbodiez Gym">
+      <img class="trust-logo-img" src="nathan_logo_ivory (1).png" alt="Nathans">
     </div>
   </div>
 </section>
