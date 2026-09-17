@@ -601,7 +601,7 @@
         </ul>
       </div>
       <div>
-        <form id="lead-form" onsubmit="event.preventDefault(); document.getElementById('form-fields').style.display='none'; document.getElementById('success').classList.add('active');">
+        <form id="lead-form" onsubmit="handleLeadSubmit(event)">
           <div id="form-fields" style="display:flex; flex-direction:column; gap:16px;">
             <div class="field-row">
               <div class="field"><label for="name">Your name</label><input id="name" type="text" placeholder="Nathan Rodriguez" required></div>
@@ -670,7 +670,7 @@
       });
     });
 
-    var wlToggle = document.getElementById('wl-toggle');
+        var wlToggle = document.getElementById('wl-toggle');
     var dashScreen = document.querySelector('.phone-screen.dash');
     wlToggle.addEventListener('click', function () {
       var isOn = wlToggle.getAttribute('aria-checked') === 'true';
@@ -678,6 +678,26 @@
       dashScreen.classList.toggle('wl-on', !isOn);
     });
   })();
+
+  function handleLeadSubmit(event) {
+    event.preventDefault();
+    var form = event.target;
+    var data = new FormData(form);
+    fetch('https://formspree.io/f/xrpbgeyn', {
+      method: 'POST',
+      body: data,
+      headers: { 'Accept': 'application/json' }
+    }).then(function (response) {
+      if (response.ok) {
+        document.getElementById('form-fields').style.display = 'none';
+        document.getElementById('success').classList.add('active');
+      } else {
+        alert('Something went wrong submitting the form. Please try again or email us directly.');
+      }
+    }).catch(function () {
+      alert('Something went wrong submitting the form. Please try again or email us directly.');
+    });
+  }
 </script>
 </body>
 </html>
